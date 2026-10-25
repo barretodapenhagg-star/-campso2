@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title id="pageTitle">@CAMP - Standoff 2</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --bg-gradient: linear-gradient(180deg, #3d0808 0%, #170505 25%, #0b0e14 60%, #07090e 100%);
+      --card-bg: #161b22;
+      --card-border: #21262d;
+      --accent-red: #da291c;
+      --text-main: #f0f6fc;
+      --text-muted: #8b949e;
+      --rating-gold: #e3b341;
+      --color-green: #238636;
+      --color-yellow: #9e6a03;
+      --color-red: #da291c;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-main);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      position: relative;
+      z-index: 10;
+      background: linear-gradient(180deg, #420d0d 0%, #1a0808 100%);
+      border-bottom: 2px solid #2a0c0c;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 15px 20px 0 20px;
+      text-align: center;
+    }
+
+    .logo-standoff {
+      max-width: 130px;
+      height: auto;
+      margin-bottom: 2px;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.7));
+    }
+
+    .header-content h1 {
+      font-size: 1.25rem;
+      font-weight: 300;
+      letter-spacing: 3px;
+      margin: 2px 0 6px 0;
+      color: #ffffff;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+
+    .header-content p {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      margin: 0 0 15px 0;
+    }
+
+    .tabs-nav {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 5px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 100;
+    }
+
+    .tab-btn {
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
+      border-bottom: none;
+      padding: 10px 16px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    .tab-btn:hover { color: #fff; background: rgba(218, 41, 28, 0.15); }
+    .tab-btn.active { background-color: var(--card-bg); color: #fff; border-color: var(--accent-red); border-top: 3px solid var(--accent-red); }
+
+    .container { max-width: 1450px; margin: 30px auto; padding: 0 15px; flex: 1; width: 100%; box-sizing: border-box; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .card {
+      background-color: rgba(22, 27, 34, 0.95);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    .card h2 { margin-top: 0; font-size: 1.4rem; border-bottom: 1px solid var(--card-border); padding-bottom: 15px; color: #fff; }
+
+    /* ESTILOS DA ABA DE DROPS & ANIMAÇÕES FLUTUANTES */
+    .drops-hero-wrapper {
+      position: relative;
+      width: 100%;
+      min-height: 520px;
+      background: radial-gradient(circle at center, #260909 0%, #0d1117 70%);
+      border: 1px solid var(--rating-gold);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      box-shadow: 0 10px 35px rgba(227, 179, 65, 0.15);
+      box-sizing: border-box;
+    }
+
+    .center-character {
+      width: 280px;
+      max-width: 90%;
+      height: auto;
+      z-index: 5;
+      filter: drop-shadow(0 15px 25px rgba(0,0,0,0.9));
+      animation: floatCharacter 4s ease-in-out infinite;
+    }
+
+    @keyframes floatCharacter {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-12px) scale(1.02); }
+    }
+
+    .floating-item {
+      position: absolute;
+      width: 85px;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 15px rgba(0,0,0,0.8));
+      z-index: 4;
+    }
+
+    .item-1 { top: 15%; left: 12%; animation: floatItem1 5s ease-in-out infinite; }
+    .item-2 { top: 20%; right: 12%; animation: floatItem2 6s ease-in-out infinite; }
+    .item-3 { bottom: 18%; left: 15%; animation: floatItem3 5.5s ease-in-out infinite; }
+    .item-4 { bottom: 15%; right: 15%; animation: floatItem4 4.5s ease-in-out infinite; }
+    .item-5 { top: 50%; left: 4%; animation: floatItem2 7s ease-in-out infinite; }
+    .item-6 { top: 48%; right: 4%; animation: floatItem1 5.8s ease-in-out infinite; }
+
+    @keyframes floatItem1 { 0%, 100% { transform: translateY(0px) rotate(-5deg); } 50% { transform: translateY(-15px) rotate(5deg); } }
+    @keyframes floatItem2 { 0%, 100% { transform: translateY(0px) rotate(8deg); } 50% { transform: translateY(-18px) rotate(-3deg); } }
+    @keyframes floatItem3 { 0%, 100% { transform: translateY(0px) rotate(3deg); } 50% { transform: translateY(-12px) rotate(-8deg); } }
+    @keyframes floatItem4 { 0%, 100% { transform: translateY(0px) rotate(-10deg); } 50% { transform: translateY(-20px) rotate(2deg); } }
+
+    .drops-hud {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      background: rgba(13, 17, 23, 0.85);
+      border: 1px solid var(--card-border);
+      padding: 20px 30px;
+      border-radius: 10px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+      max-width: 550px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 15px;
+    }
+
+    .timer-display {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--rating-gold);
+      font-family: monospace;
+      letter-spacing: 2px;
+      margin: 8px 0;
+      text-shadow: 0 0 15px rgba(227, 179, 65, 0.4);
+    }
+
+    .promo-box {
+      background: #07090e;
+      border: 2px dashed var(--accent-red);
+      padding: 12px 20px;
+      border-radius: 6px;
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .promo-code-text {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #fff;
+      font-family: monospace;
+      letter-spacing: 1px;
+    }
+
+    .claim-btn {
+      background-color: var(--accent-red);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
+    .claim-btn:hover { background-color: #b82217; transform: translateY(-2px); }
+
+    /* Tabelas e Formulários */
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #0d1117; border-radius: 6px; overflow: hidden; }
+    th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--card-border); font-size: 0.9rem; }
+    th { background-color: #1a222d; color: var(--rating-gold); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+    tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; }
+    .form-control { width: 100%; padding: 12px; background: #07090e; border: 1px solid var(--card-border); color: #fff; border-radius: 6px; box-sizing: border-box; }
+    .form-control:focus { border-color: var(--accent-red); outline: none; }
+    .submit-btn { background-color: var(--accent-red); color: white; border: none; padding: 12px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; margin-top: 10px; transition: 0.2s; }
+    .submit-btn:hover { background-color: #b82217; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-content">
+      <img src="FabiooDzn_Rafael_1.png" alt="Logo Standoff 2" class="logo-standoff">
+      <h1>@CAMP - STANDOFF 2</h1>
+      <p>Painel Oficial do Torneio e Drops Diários</p>
+      
+      <div class="tabs-nav">
+        <button class="tab-btn active" onclick="switchTab('drops')">Drops Diários</button>
+        <button class="tab-btn" onclick="switchTab('inscricao')">Inscrever-se</button>
+        <button class="tab-btn" onclick="switchTab('tabelas')">Equipas & Solos</button>
+        <button class="tab-btn" onclick="switchTab('chaveamento')">Chaveamento</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <!-- ABA DE DROPS -->
+    <div id="tab-drops" class="tab-content active">
+      <div class="card">
+        <div class="drops-hero-wrapper">
+          <img src="FabiooDzn_Rafael_1.png" alt="Rafael" class="center-character">
+          <img src="FabiooDzn_ArcaneCase_Prey.png" alt="Item" class="floating-item item-1">
+          <img src="FabiooDzn_Case_Champion_2.png" alt="Item" class="floating-item item-2">
+          <img src="FabiooDzn_Coin_2.png" alt="Item" class="floating-item item-3">
+          <img src="FabiooDzn_Gold_1.png" alt="Item" class="floating-item item-4">
+          <img src="FabiooDzn_GiftBox_NY2018_5.png" alt="Item" class="floating-item item-5">
+          <img src="FabiooDzn_Stattrack2.png" alt="Item" class="floating-item item-6">
+
+          <div class="drops-hud">
+            <h3>Próximo Drop Exclusivo</h3>
+            <div class="timer-display" id="countdownTimer">23:59:59</div>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Resgate o código promocional abaixo no jogo:</p>
+            <div class="promo-box">
+              <span class="promo-code-text" id="promoCodeDisplay">ST2-CAMP-ELITE-2026</span>
+              <button class="claim-btn" onclick="copyPromoCode()">Copiar Código</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA DE INSCRIÇÃO -->
+    <div id="tab-inscricao" class="tab-content">
+      <div class="card" style="max-width: 700px; margin: 0 auto;">
+        <h2>Registo no Torneio</h2>
+        <form id="formInscricao" onsubmit="enviarInscricao(event)">
+          <div class="form-group">
+            <label>Modalidade</label>
+            <select id="modalidade" class="form-control" onchange="mudarModalidade()">
+              <option value="time">Equipa / Line-up</option>
+              <option value="solo">Solo (Sem Equipa)</option>
+            </select>
+          </div>
+
+          <div id="camposTime">
+            <div class="form-group">
+              <label>Nome da Equipa</label>
+              <input type="text" id="nomeTime" class="form-control" placeholder="Ex: Team Elite">
+            </div>
+            <div class="form-group">
+              <label>TAG da Equipa</label>
+              <input type="text" id="tagTime" class="form-control" placeholder="Ex: ELITE">
+            </div>
+            <div class="form-group">
+              <label>Nome do Capitão</label>
+              <input type="text" id="nomeCapitao" class="form-control" placeholder="O teu nome completo">
+            </div>
+            <div class="form-group">
+              <label>Integrantes (Nicks)</label>
+              <textarea id="integrantes" class="form-control" placeholder="Lista os nicks dos 5 jogadores..."></textarea>
+            </div>
+          </div>
+
+          <div id="camposSolo" style="display:none;">
+            <div class="form-group">
+              <label>E-mail</label>
+              <input type="email" id="email" class="form-control" placeholder="teu@email.com">
+            </div>
+            <div class="form-group">
+              <label>Telefone / WhatsApp</label>
+              <input type="text" id="telefone" class="form-control" placeholder="(00) 00000-0000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Nick no Standoff 2</label>
+            <input type="text" id="nick" class="form-control" placeholder="Teu nick exato no jogo" required>
+          </div>
+          <div class="form-group">
+            <label>ID do Standoff 2</label>
+            <input type="text" id="idStandoff" class="form-control" placeholder="Ex: 12345678" required>
+          </div>
+          <div class="form-group">
+            <label>Função Principal</label>
+            <select id="funcao" class="form-control">
+              <option value="Entry Fragger">Entry Fragger</option>
+              <option value="Support">Support</option>
+              <option value="Sniper (AWP)">Sniper (AWP)</option>
+              <option value="Lurker">Lurker</option>
+              <option value="IGL (Capitão)">IGL (Capitão)</option>
+            </select>
+          </div>
+
+          <button type="submit" class="submit-btn">Efetuar Inscrição</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ABA DE EQUIPAS & SOLOS -->
+    <div id="tab-tabelas" class="tab-content">
+      <div class="card">
+        <h2>Equipas Inscritas</h2>
+        <div id="tabelaTimesContainer">
+          <p style="color: var(--text-muted);">A carregar equipas da planilha...</p>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Jogadores Solo</h2>
+        <div id="tabelaSolosContainer">
+          <p style="color: var(--text-muted);">A carregar jogadores solo...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA DE CHAVEAMENTO -->
+    <div id="tab-chaveamento" class="tab-content">
+      <div class="card">
+        <h2>Chaveamento do Torneio / Mata-Mata</h2>
+        <p style="color: var(--text-muted);">O chaveamento oficial será atualizado assim que as inscrições forem encerradas.</p>
+        <div style="text-align: center; padding: 40px; color: var(--rating-gold); font-size: 1.1rem; font-weight: bold;">
+          [ Em Breve - Chaveamento Oficial ]
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function mudarModalidade() {
+      const mod = document.getElementById('modalidade').value;
+      if (mod === 'time') {
+        document.getElementById('camposTime').style.display = 'block';
+        document.getElementById('camposSolo').style.display = 'none';
+      } else {
+        document.getElementById('camposTime').style.display = 'none';
+        document.getElementById('camposSolo').style.display = 'block';
+      }
+    }
+
+    function copyPromoCode() {
+      const code = document.getElementById('promoCodeDisplay').innerText;
+      navigator.clipboard.writeText(code);
+      alert('Código promocional copiado: ' + code);
+    }
+
+    function enviarInscricao(event) {
+      event.preventDefault();
+      alert('Funcionalidade de envio conectada ao Google Sheets!');
+    }
+  </script>
+</body>
+</html>
